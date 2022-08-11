@@ -11,7 +11,6 @@ function makeGrid()
     let y = Math.floor(gridDiv.offsetHeight / cell_size[1]);
 
 	size = [x, y];
-    console.log(size);
 	// Removes all previous elements of the grid.
 	while (gridDiv.firstChild)
 	{
@@ -38,7 +37,6 @@ function makeGrid()
 			newRow.appendChild(newCell);
             grid[i].push(newCell);
 		}
-		console.log(newRow);
 		gridTable.append(newRow);
 	}
 }
@@ -59,20 +57,38 @@ class Snake
     constructor(posx = 1, posy = 1)
     {
         this.body = [[posx, posy]];
+		this.dir = [1, 0];
     }
 
-	addTail(posx, posy)
+	addTail()
 	{
-		this.body.append([posx, posy]);
+		let prevTail = this.body[this.body.length - 1];
+		this.addTailTo(prevTail[0], prevTail[1]);
 	}
 
-	move(posx, posy)
+	addTailTo(posx, posy)
+	{
+		this.body.push([posx, posy]);
+	}
+
+	move()
+	{
+		this.moveTo(this.body[0][0] + this.dir[0], 
+					 this.body[0][1] + this.dir[1]);
+	}
+
+	moveTo(posx, posy)
 	{
 		for (let i = this.body.length - 1; i > 0; i--)
 		{
 			this.body[i] = this.body[i - 1];
 		}
 		this.body[0] = [posx, posy];
+	}
+
+	setDir(posx, posy)
+	{
+		this.dir = [posx, posy];
 	}
 
 	display()
@@ -93,8 +109,32 @@ function init()
 var snake;
 init();
 
-function play()
+document.addEventListener('keydown', (event) => 
 {
-	displayGrid();
-	snake.display();
+	if (event.key == "w")
+		snake.setDir(-1, 0);
+	else if (event.key == "a")
+		snake.setDir(0, -1);
+	else if (event.key == "s")
+		snake.setDir(1, 0);
+	else if (event.key == "d")
+		snake.setDir(0, 1);
+}, false);
+
+function delay(time)
+{
+	return new Promise(resolve => setTimeout(resolve, time));
+}
+
+async function play()
+{
+	while (1)
+	{
+		snake.move();
+		snake.addTail();
+
+		displayGrid();
+		snake.display();
+		await delay(250);
+	}
 }
