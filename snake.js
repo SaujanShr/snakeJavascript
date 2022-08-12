@@ -96,6 +96,11 @@ class Snake
 		return (this.body[0][0] == foodLoc[0] && this.body[0][1] == foodLoc[1]);
 	}
 
+	getDir()
+	{
+		return this.dir;
+	}
+
 	setDir(posx, posy)
 	{
 		this.dir = [posx, posy];
@@ -158,14 +163,19 @@ init();
 
 document.addEventListener('keydown', (event) => 
 {
+	let currDir = snake.getDir();
+	let newDir;
 	if (event.key == "w")
-		snake.setDir(-1, 0);
+		newDir = [-1, 0];
 	else if (event.key == "a")
-		snake.setDir(0, -1);
+		newDir = [0, -1];
 	else if (event.key == "s")
-		snake.setDir(1, 0);
+		newDir = [1, 0];
 	else if (event.key == "d")
-		snake.setDir(0, 1);
+		newDir = [0, 1];
+	
+		if (!(newDir[0] + currDir[0] == 0 && newDir[1] + currDir[1] == 0))
+			snake.setDir(newDir[0], newDir[1]);
 }, false);
 
 function delay(time)
