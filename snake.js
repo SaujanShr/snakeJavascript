@@ -60,6 +60,11 @@ class Snake
 		this.dir = [1, 0];
     }
 
+	getBody()
+	{
+		return this.body;
+	}
+
 	addTail()
 	{
 		let prevTail = this.body[this.body.length - 1];
@@ -86,6 +91,11 @@ class Snake
 		this.body[0] = [posx, posy];
 	}
 
+	foundFood(foodLoc)
+	{
+		return (this.body[0][0] == foodLoc[0] && this.body[0][1] == foodLoc[1]);
+	}
+
 	setDir(posx, posy)
 	{
 		this.dir = [posx, posy];
@@ -100,13 +110,50 @@ class Snake
 	}
 }
 
+class Food
+{
+	constructor()
+	{
+	}
+
+	getLoc()
+	{
+		return this.loc;
+	}
+
+	spawn(body)
+	{
+		while (1)
+		{
+			let newLoc = [Math.floor(Math.random() * grid.length),
+					  	  Math.floor(Math.random() * grid[0].length)];
+			for (let i = 0; i < body.length; i++)
+			{
+				if (body[i] == newLoc[i])
+					continue;
+			}
+			this.loc = newLoc;
+			return;
+		}
+	}
+
+	display()
+	{
+		console.log("loc = " + this.loc);
+		grid[this.loc[0]][this.loc[1]].style.backgroundColor = "red";
+	}
+}
+
 function init()
 {
 	makeGrid();
 	snake = new Snake();
+	food = new Food();
+	food.spawn(snake.getBody());
 }
 
 var snake;
+var food;
 init();
 
 document.addEventListener('keydown', (event) => 
@@ -130,11 +177,17 @@ async function play()
 {
 	while (1)
 	{
+		makeGrid();
 		snake.move();
-		snake.addTail();
+		if (snake.foundFood(food.getLoc()))
+		{
+			snake.addTail();
+			food.spawn(snake.getBody());
+		}
 
 		displayGrid();
+		food.display();
 		snake.display();
-		await delay(250);
+		await delay(100);
 	}
 }
